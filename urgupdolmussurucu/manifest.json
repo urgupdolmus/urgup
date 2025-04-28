@@ -1,0 +1,21 @@
+{
+  "name": "\u00dcrg\u00fcp Dolmu\u015f S\u00fcr\u00fcc\u00fc",
+  "short_name": "Dolmu\u015fS\u00fcr\u00fcc\u00fc",
+  "start_url": "./urgupdolmussurucu.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "description": "\u00dcrg\u00fcp dolmu\u015f s\u00fcr\u00fcc\u00fc konum g\u00f6nderici uygulamas\u0131",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

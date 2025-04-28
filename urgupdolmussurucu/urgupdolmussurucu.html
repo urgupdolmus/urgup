@@ -1,1 +1,99 @@
-wwww
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ürgüp Dolmuş Sürücü Konum Gönderici</title>
+
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(function(reg) {
+          console.log('Service Worker kayıtlı.', reg);
+        })
+        .catch(function(err) {
+          console.error('Service Worker kaydedilemedi:', err);
+        });
+    }
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzyhgc-VfFiy0uCxdbR3ToEKJAvvKAo2g",
+      authDomain: "dolm-65cb0.firebaseapp.com",
+      databaseURL: "https://dolm-65cb0-default-rtdb.firebaseio.com",
+      projectId: "dolm-65cb0",
+      storageBucket: "dolm-65cb0.appspot.com",
+      messagingSenderId: "158858911116",
+      appId: "1:158858911116:web:e2caeb96cd5c4930e84aa9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let plaka = localStorage.getItem('plaka') || '';
+
+    function startSendingLocation() {
+      if (!plaka) {
+        plaka = prompt("Lütfen plakanızı girin (Örnek: 50ABC123):");
+        if (plaka) {
+          localStorage.setItem('plaka', plaka);
+        } else {
+          alert("Plaka zorunlu!");
+          return;
+        }
+      }
+
+      if ('geolocation' in navigator) {
+        navigator.geolocation.watchPosition(function(position) {
+          const enlem = position.coords.latitude;
+          const boylam = position.coords.longitude;
+          const zaman = new Date().toLocaleTimeString('tr-TR');
+
+          database.ref('anlik_konumlar/' + plaka).set({
+            enlem: enlem,
+            boylam: boylam,
+            zaman: zaman
+          });
+
+          document.getElementById('status').innerText = `Konum gönderildi: ${enlem.toFixed(5)}, ${boylam.toFixed(5)} (${zaman})`;
+        }, function(error) {
+          console.error(error);
+          alert('Konum alınamadı: ' + error.message);
+        }, {
+          enableHighAccuracy: true,
+          maximumAge: 10000,
+          timeout: 5000
+        });
+      } else {
+        alert('Tarayıcı konum desteği vermiyor!');
+      }
+    }
+
+    window.onload = function() {
+      startSendingLocation();
+    };
+  </script>
+</head>
+
+<body>
+  <h1>Ürgüp Dolmuş Sürücü</h1>
+  <div id="status">Konum bekleniyor...</div>
+</body>
+</html>
