@@ -1,0 +1,21 @@
+{
+  "name": "\u00dcrg\u00fcp Dolmu\u015f Harita",
+  "short_name": "Dolmu\u015fHarita",
+  "start_url": "./harita.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "description": "\u00dcrg\u00fcp dolmu\u015flar\u0131n\u0131n canl\u0131 harita uygulamas\u0131",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

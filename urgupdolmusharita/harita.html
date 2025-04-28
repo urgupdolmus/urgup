@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ürgüp Dolmuş Canlı Harita</title>
+
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(function(reg) {
+          console.log('Service Worker kayıtlı.', reg);
+        })
+        .catch(function(err) {
+          console.error('Service Worker kaydedilemedi:', err);
+        });
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzyhgc-VfFiy0uCxdbR3ToEKJAvvKAo2g",
+      authDomain: "dolm-65cb0.firebaseapp.com",
+      databaseURL: "https://dolm-65cb0-default-rtdb.firebaseio.com",
+      projectId: "dolm-65cb0",
+      storageBucket: "dolm-65cb0.appspot.com",
+      messagingSenderId: "158858911116",
+      appId: "1:158858911116:web:e2caeb96cd5c4930e84aa9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let map;
+    let markers = {};
+
+    function initMap() {
+      map = L.map('map').setView([38.6311, 34.9126], 14);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      fetchData();
+      setInterval(fetchData, 5000);
+    }
+
+    function fetchData() {
+      database.ref('anlik_konumlar/').once('value').then((snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          for (const plaka in data) {
+            const konum = [data[plaka].enlem, data[plaka].boylam];
+
+            if (!markers[plaka]) {
+              const icon = L.icon({
+                iconUrl: 'mini-dolmus.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+              });
+
+              markers[plaka] = L.marker(konum, { icon: icon }).addTo(map)
+                .bindPopup(plaka);
+            } else {
+              markers[plaka].setLatLng(konum);
+            }
+          }
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
+
+    window.onload = initMap;
+  </script>
+</head>
+
+<body>
+  <div id="map"></div>
+</body>
+</html>
