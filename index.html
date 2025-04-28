@@ -9,23 +9,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
     <script>
-        // 🚀 BURAYA KENDİ FIREBASE WEB CONFIG'İNİ YAPIŞTIR
+        // 🔥 Güncel Firebase Config buraya yerleştirildi
         const firebaseConfig = {
-          apiKey: "AIzaSyXXXXXX",      // ← kendi API Key'in
-          authDomain: "senin-proje.firebaseapp.com",
-          databaseURL: "https://senin-proje-default-rtdb.firebaseio.com",  // ← Dikkat! doğru URL
-          projectId: "senin-proje",
-          storageBucket: "senin-proje.appspot.com",
-          messagingSenderId: "1234567890",
-          appId: "1:1234567890:web:abcdef"
+            apiKey: "AIzaSyBzyhgc-VfFiy0uCxdbR3ToEKJAvvKAo2g",
+            authDomain: "dolm-65cb0.firebaseapp.com",
+            databaseURL: "https://dolm-65cb0-default-rtdb.firebaseio.com",
+            projectId: "dolm-65cb0",
+            storageBucket: "dolm-65cb0.appspot.com",
+            messagingSenderId: "158858911116",
+            appId: "1:158858911116:web:e2caeb96cd5c4930e84aa9"
         };
 
+        // Firebase'i başlat
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
     </script>
 </head>
 <body>
-    <h1>Konum Bilgisi Gönderme</h1>
+    <h1>Konum Bilgisi Gönder</h1>
     <button onclick="getLocation()">Konumumu Gönder</button>
     <p id="durum">Henüz konum alınmadı.</p>
 
@@ -33,21 +34,47 @@
         function getLocation() {
             if (navigator.geolocation) {
                 document.getElementById("durum").innerText = "Konum alınıyor...";
-                navigator.geolocation.getCurrentPosition(showPosition, showError, {enableHighAccuracy: true});
+                navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
             } else {
-                document.getElementById("durum").innerText = "Tarayıcı konum desteklemiyor.";
+                document.getElementById("durum").innerText = "Tarayıcınız konumu desteklemiyor.";
             }
         }
 
         function showPosition(position) {
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
-            var timestamp = new Date().toISOString(); // Konum alınma zamanı
+            var timestamp = new Date().toISOString();
 
-            document.getElementById("durum").innerHTML = `Enlem: ${latitude} <br>Boylam: ${longitude}`;
+            document.getElementById("durum").innerHTML = `Enlem: ${latitude}<br>Boylam: ${longitude}`;
 
-            // Firebase'e gönder
+            // Veriyi Firebase'e kaydet
             database.ref('anlik_konumlar').push({
                 enlem: latitude,
                 boylam: longitude,
-                zaman
+                zaman: timestamp
+            }).then(() => {
+                alert("Konum başarıyla Firebase'e kaydedildi!");
+            }).catch((error) => {
+                alert("Firebase'e kaydetme hatası: " + error.message);
+            });
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Kullanıcı konum iznini reddetti.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Konum bilgisi kullanılamıyor.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Konum isteği zaman aşımına uğradı.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Bilinmeyen bir hata oluştu.");
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
