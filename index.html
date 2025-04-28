@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ürgüp Dolmuş Takip (Leaflet)</title>
+
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(function(reg) {
+          console.log('Service Worker kayıtlı.', reg);
+        })
+        .catch(function(err) {
+          console.error('Service Worker kaydedilemedi:', err);
+        });
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzyhgc-VfFiy0uCxdbR3ToEKJAvvKAo2g",
+      authDomain: "dolm-65cb0.firebaseapp.com",
+      databaseURL: "https://dolm-65cb0-default-rtdb.firebaseio.com",
+      projectId: "dolm-65cb0",
+      storageBucket: "dolm-65cb0.appspot.com",
+      messagingSenderId: "158858911116",
+      appId: "1:158858911116:web:e2caeb96cd5c4930e84aa9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let map;
+    let marker;
+    let plaka;
+
+    function getPlakaFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('plaka');
+    }
+
+    function initMap() {
+      map = L.map('map').setView([39.0, 35.0], 6);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      plaka = getPlakaFromURL();
+      if (plaka) {
+        fetchData();
+        setInterval(fetchData, 20000);
+      } else {
+        alert("Plaka bulunamadı!");
+      }
+    }
+
+    function fetchData() {
+      database.ref('anlik_konumlar/' + plaka).get().then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const konum = [data.enlem, data.boylam];
+          if (!marker) {
+            marker = L.marker(konum).addTo(map).bindPopup(plaka).openPopup();
+            map.setView(konum, 15);
+          } else {
+            marker.setLatLng(konum);
+          }
+        } else {
+          console.log("Veri bulunamadı: " + plaka);
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
+
+    window.onload = initMap;
+  </script>
+
+</head>
+
+<body>
+  <div id="map"></div>
+</body>
+</html>
